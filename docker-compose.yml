@@ -1,0 +1,107 @@
+version: '3'
+networks:
+  von:
+services:
+
+  issuer-agent:
+    image: bcgovimages/aries-cloudagent:py3.9-indy-1.16.0_0.11.0-rc1
+    ports:
+      - 11000:11000
+      - 8001:8001
+    entrypoint: /bin/bash
+    command: [
+        "-c",
+        "sleep 5; \
+        aca-py start \
+        --auto-provision \
+        --seed 'issuer00000000000000000000000001' \
+        --inbound-transport http '0.0.0.0' 8001 \
+        --endpoint 'http://issuer-agent:8001' \
+        --outbound-transport http \
+        --genesis-url 'http://webserver:8000/genesis' \
+        --auto-accept-invites \
+        --auto-accept-requests \
+        --auto-ping-connection \
+        --auto-respond-messages \
+        --auto-respond-credential-proposal \
+        --auto-store-credential \
+        --auto-respond-credential-offer \
+        --auto-respond-credential-request \
+        --notify-revocation \
+        --monitor-revocation-notification \
+        --wallet-type 'askar' \
+        --wallet-name 'issuer_agent_wallet' \
+        --wallet-key 'key' \
+        --admin '0.0.0.0' 11000 \
+        --admin-insecure-mode \
+        --wallet-storage-type 'postgres_storage' \
+        --wallet-storage-config '{\"url\":\"wallet-db:5432\",\"max_connections\":5}' \
+        --wallet-storage-creds '{\"account\":\"DB_USER\",\"password\":\"DB_PASSWORD\",\"admin_account\":\"DB_USER\",\"admin_password\":\"DB_PASSWORD\"}' \
+        --label 'issuer' \
+        --log-level 'info' ",
+      ]
+    depends_on:
+      - wallet-db      
+    networks:
+      - von
+
+
+
+  verifier-agent:
+    image: bcgovimages/aries-cloudagent:py3.9-indy-1.16.0_0.11.0-rc1
+    ports:
+      - 11001:11000
+      - 8002:8001
+    entrypoint: /bin/bash
+    command: [
+        "-c",
+        "sleep 5; \
+        aca-py start \
+        --auto-provision \
+        --seed 'verifi00000000000000000000000001' \
+        --inbound-transport http '0.0.0.0' 8001 \
+        --endpoint 'http://verifier-agent:8001' \
+        --outbound-transport http \
+        --genesis-url 'http://webserver:8000/genesis' \
+        --auto-accept-invites \
+        --auto-accept-requests \
+        --auto-ping-connection \
+        --auto-respond-messages \
+        --auto-respond-credential-proposal \
+        --auto-store-credential \
+        --auto-respond-credential-offer \
+        --auto-respond-credential-request \
+        --notify-revocation \
+        --monitor-revocation-notification \
+        --wallet-type 'askar' \
+        --wallet-name 'verifier_agent_wallet' \
+        --wallet-key 'key' \
+        --admin '0.0.0.0' 11000 \
+        --admin-insecure-mode \
+        --wallet-storage-type 'postgres_storage' \
+        --wallet-storage-config '{\"url\":\"wallet-db:5432\",\"max_connections\":5}' \
+        --wallet-storage-creds '{\"account\":\"DB_USER\",\"password\":\"DB_PASSWORD\",\"admin_account\":\"DB_USER\",\"admin_password\":\"DB_PASSWORD\"}' \
+        --label 'Verifier' \
+        --log-level 'info' ",
+      ]
+    depends_on:
+      - wallet-db      
+    networks:
+      - von
+
+
+
+  wallet-db:
+    image: postgres:12
+    environment:
+      - POSTGRES_USER=DB_USER
+      - POSTGRES_PASSWORD=DB_PASSWORD
+    ports:
+      - 5432:5432
+    volumes:
+      - wallet-db-data:/var/lib/pgsql/data
+    networks:
+      - von
+
+volumes:
+  wallet-db-data:

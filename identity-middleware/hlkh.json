@@ -1,0 +1,36 @@
+{
+    connection_id: connection_id,
+    filter: {
+      ld_proof: {
+        credential: {
+        "@context": [
+          "https://www.w3.org/2018/credentials/v1",
+          "https://ref.gs1.org/gs1/vc/license-context/"
+        ],
+          type: [
+          "VerifiableCredential",
+          "GS1IdentificationKeyLicenseCredential"
+        ],
+          issuer: "did:key:zUC743UBdqakWTU3LwYMcrGDuraWahPQwWZyTvsnTxLTWde1F64oFuGjo2LindHzvUu5D8mUY8YfXGps9qwsniyZDVBnkygMN2SE2WfYAgudK4HDMZ47Bt2eTUSuyBYzts7yPXh",
+          issuanceDate: new Date().toISOString(),
+          credentialSubject: {
+            id: "did:key:zUC73c8sECZbtNfUWauT6JEzovPnH7TtkNQyiF86tDzobooaX3u5dzcpZe8V8XksQqXNy12SwWjvNDiJ6MbEpXnNVrScBJr59v5vnajZGH2hdF6XwL55WXWWgAshS9vY9uUVtkV",
+            organization: {
+            "gs1:partyGLN": "7541234000006",
+            "gs1:organizationName": attributes.find(attr => attr.name === 'Manufacturer').value,
+            "gs1:BarcodeSeries": attributes.find(attr =>attr.name === 'BarcodeSeries' ).value,
+            "gs1:RegistrationDate": attributes.find(attr =>attr.name === 'RegistrationDate' ).value,
+            "gs1:ExpiryDate": attributes.find(attr =>attr.name === 'ExpiryDate' ).value,
+          },
+            extendsCredential: "https://id.gs1.org/vc/license/gs1_prefix/754627",
+            licenseValue: attributes.find(attr => attr.name === 'Gcp').value,
+            alternativeLicenseValue: attributes.find(attr => attr.name === 'Gcp').value,
+            identificationKeyType: "GTIN",
+        }
+      },
+        options: {
+          proofType: "BbsBlsSignature2020"
+      }
+    }
+  }
+}
